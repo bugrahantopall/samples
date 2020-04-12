@@ -14,24 +14,25 @@ export default class Webcam extends React.Component {
             status : 'Inactive',
             recording : null,
             mediaSource : new MediaSource(),
-            sourceBuffer : null
+            sourceBuffer : null,
+            options: null,
+            recordedBlobs: []
         }
-
         this.state.mediaSource.addEventListener('sourceopen', this.handleSourceOpen, false);
     }
 
     async _startCapturing(e) {
-        this.recordedBlobs = [];
-        let options = {mimeType: 'video/webm;codecs=vp9'};
-        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            console.error(`${options.mimeType} is not Supported`);
-            options = {mimeType: 'video/webm;codecs=vp8'};
-            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            console.error(`${options.mimeType} is not Supported`);
-            options = {mimeType: 'video/webm'};
-            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                console.error(`${options.mimeType} is not Supported`);
-                options = {mimeType: ''};
+        let recordedBlobss = [];
+        this.state.options = {mimeType: 'video/webm;codecs=vp9'};
+        if (!MediaRecorder.isTypeSupported(this.state.options.mimeType)) {
+            console.error(`${this.state.options.mimeType} is not Supported`);
+            this.state.options = {mimeType: 'video/webm;codecs=vp8'};
+            if (!MediaRecorder.isTypeSupported(this.state.options.mimeType)) {
+            console.error(`${this.state.options.mimeType} is not Supported`);
+            this.state.options = {mimeType: 'video/webm'};
+            if (!MediaRecorder.isTypeSupported(this.state.options.mimeType)) {
+                console.error(`${this.state.options.mimeType} is not Supported`);
+                this.state.options = {mimeType: ''};
             }
             }
         }
@@ -44,43 +45,50 @@ export default class Webcam extends React.Component {
               width: 1280, height: 720
             }
           };
+        this.state.stream = await navigator.mediaDevices.getUserMedia(constraints);
 
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      
 
-        console.log('getUserMedia() got stream:', stream);
-        window.stream = stream;
+      
+        console.log('getUserMedia() got stream:', this.state.stream);
+        window.stream = this.state.stream;
 
         try {
-            this.state.mediaRecorder = new MediaRecorder(window.stream, options);
+            this.state.mediaRecorder = new MediaRecorder(window.stream, this.state.options);
         } catch (e) {
             console.error('Exception while creating MediaRecorder:', e);
             return;
         }
-
         
 
 
-        console.log('Created MediaRecorder', this.state.mediaRecorder, 'with options', options);
+        console.log('Created MediaRecorder', this.state.mediaRecorder, 'with options', this.state.options);
         this.setState({enableDownloadRecording : true , enableStartCapture: false});
         this.state.mediaRecorder.onstop = (event) => {
             console.log('Recorder stopped: ', event);
-            console.log('Recorded Blobs: ', this.recordedBlobs);
+            console.log('Recorded Blobs: ', recordedBlobss);
         };
-        this.state.mediaRecorder.ondataavailable = this.handleDataAvailable;
+        this.state.mediaRecorder.ondataavailable = (event) => {
+          console.log('handleDataAvailable', event);
+          if (event.data && event.data.size > 0) {
+            recordedBlobss.push(event.data);
+          }
+          this.setState({recordedBlobs:recordedBlobss});
+        };
         this.state.mediaRecorder.start(10); // collect 10ms of data
         console.log('MediaRecorder started', this.state.mediaRecorder);
       }
 
-      _stopCapturing(e) {
+      async _stopCapturing(e) {
+        //this.afterManualStop();
 
-        this.setState({enableDownloadRecording : true , enableStartCapture: false});
+        this.setState({enableDownloadRecording : false , enableStartCapture: true});
         this.state.mediaRecorder.stop();
 
         this._downloadCapture();
 
         
       }
-
       handleSourceOpen(event) {
         console.log('MediaSource opened');
         this.state.sourceBuffer = this.state.mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
@@ -88,16 +96,13 @@ export default class Webcam extends React.Component {
       }
       
       handleDataAvailable(event) {
-        console.log('handleDataAvailable', event);
-        if (event.data && event.data.size > 0) {
-          this.recordedBlobs.push(event.data);
-        }
+        
       }
 
       _downloadCapture(){
 
 
-        let blob = new Blob(this.recordedBlobs, {type: 'video/webm'});
+        let blob = new Blob(this.state.recordedBlobs, {type: 'video/webm'});
         let url = window.URL.createObjectURL(blob);
         let a = document.createElement('a');
         a.style.display = 'none';
