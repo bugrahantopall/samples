@@ -122,7 +122,8 @@ export default class Webcam extends React.Component {
             
                     <StyledMainDiv>
                         <StyledButton 
-                            disabled={!this.state.enableStartCapture}
+                            display={!this.state.enableStartCapture ? "inherit" : "none"}
+                            Display={this.state.enableStartCapture}
                             onClick={e => this._startCapturing(e)}
                         >
                             Webcam kaydı başlatın
@@ -131,10 +132,11 @@ export default class Webcam extends React.Component {
                             href="https://github.com/styled-components/styled-components"
                             target="_blank"
                             rel="noopener"
-                            disabled={!this.state.enableDownloadRecording}
+                            display={!this.state.enableDownloadRecording ? "inherit" : "none"}
+                            Display={this.state.enableDownloadRecording}
                             onClick={e => this._stopCapturing(e)}
                         >
-                        Kaydı İndirin
+                        Kaydı Durdurun ve İndirin
                         </StyledButton>
                         <ShadowLink id="downloadLink" type="video/webm"></ShadowLink>
                     </StyledMainDiv>

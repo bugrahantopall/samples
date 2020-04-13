@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 
 const StyledButton = styled.button`
@@ -8,6 +8,7 @@ const StyledButton = styled.button`
     color: palevioletred;
     margin: 0 1em;
     padding: 0.25em 1em;
+    ${props => !props.Display && css`display:none`}
 `;
 
 const ButtonHref = styled.a`
