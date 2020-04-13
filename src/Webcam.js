@@ -13,12 +13,10 @@ export default class Webcam extends React.Component {
             mediaRecorder : null,
             status : 'Inactive',
             recording : null,
-            mediaSource : new MediaSource(),
             sourceBuffer : null,
             options: null,
             recordedBlobs: []
         }
-        this.state.mediaSource.addEventListener('sourceopen', this.handleSourceOpen, false);
     }
 
     async _startCapturing(e) {
@@ -54,7 +52,7 @@ export default class Webcam extends React.Component {
         window.stream = this.state.stream;
 
         try {
-            this.state.mediaRecorder = new MediaRecorder(window.stream, this.state.options);
+            this.mediaRecorder = new MediaRecorder(window.stream, this.state.options);
         } catch (e) {
             console.error('Exception while creating MediaRecorder:', e);
             return;
@@ -64,36 +62,37 @@ export default class Webcam extends React.Component {
 
         console.log('Created MediaRecorder', this.state.mediaRecorder, 'with options', this.state.options);
         this.setState({enableDownloadRecording : true , enableStartCapture: false});
-        this.state.mediaRecorder.onstop = (event) => {
+        this.mediaRecorder.onstop = (event) => {
             console.log('Recorder stopped: ', event);
             console.log('Recorded Blobs: ', recordedBlobss);
         };
-        this.state.mediaRecorder.ondataavailable = (event) => {
+        this.mediaRecorder.ondataavailable = (event) => {
           console.log('handleDataAvailable', event);
           if (event.data && event.data.size > 0) {
             recordedBlobss.push(event.data);
           }
           this.setState({recordedBlobs:recordedBlobss});
         };
-        this.state.mediaRecorder.start(10); // collect 10ms of data
-        console.log('MediaRecorder started', this.state.mediaRecorder);
+        this.mediaRecorder.start(10); // collect 10ms of data
+        console.log('MediaRecorder started', this.mediaRecorder);
       }
 
-      async _stopCapturing(e) {
+      _stopCapturing(e) {
         //this.afterManualStop();
 
         this.setState({enableDownloadRecording : false , enableStartCapture: true});
-        this.state.mediaRecorder.stop();
+        this.state.stream.getTracks().forEach(track => track.stop());
+        this.mediaRecorder.stop();
 
         this._downloadCapture();
 
         
       }
-      handleSourceOpen(event) {
+      /*handleSourceOpen(event) {
         console.log('MediaSource opened');
         this.state.sourceBuffer = this.state.mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
         console.log('Source buffer: ', this.state.sourceBuffer);
-      }
+      }*/
       
       handleDataAvailable(event) {
         
