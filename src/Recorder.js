@@ -31,19 +31,28 @@ export default class Recorder extends React.Component {
     
         this.setState({chunks : []});
         this.setState({recording : null});
+        debugger;
         this.stream = await Recorder._startScreenCapture();
+
+        console.log("strem : ", this.stream);
         //this.setState({stream : this.stream});
         this.stream.addEventListener('inactive', e => {
             console.log('Capture stream inactive - stop recording!');
             this._downloadCapture(e);
           });
-        this.setState({mediaRecorder : new MediaRecorder(this.stream, {mimeType: 'video/webm'})});
-        this.state.mediaRecorder.addEventListener('dataavailable', event => {
+          debugger;
+        //this.setState({mediaRecorder : new MediaRecorder(this.stream, {mimeType: 'video/webm'})});
+        this.mediaRecorder = new MediaRecorder(this.stream, {mimeType: 'video/webm'});
+
+        console.log("media recorder : ",this.mediaRecorder);
+        this.mediaRecorder.addEventListener('dataavailable', event => {
+          console.log("event entry : " ,event);
           if (event.data && event.data.size > 0) {
+            console.log("event in if : " ,event);
             this.state.chunks.push(event.data);
           }
         });
-        this.state.mediaRecorder.start(10);
+        this.mediaRecorder.start(10);
       }
 
     static _startScreenCapture() {
@@ -63,11 +72,11 @@ export default class Recorder extends React.Component {
         this.setState({status : 'Screen recorded completed.'});
         this.setState({enableStartCapture : true});
         this.setState({enableDownloadRecording : false});
-    
+        debugger;
         this.stream.getTracks().forEach(track => track.stop());
         this.stream = null;
-        this.state.mediaRecorder.stop();        
-        this.state.mediaRecorder = null;
+        this.mediaRecorder.stop();        
+        this.mediaRecorder = null;
         
         
     
