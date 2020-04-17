@@ -12,9 +12,41 @@
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/android.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>Emlak Katılım Recorder</title>
+    <script type="text/javascript">
+
+      function EmlakBOAStartScreenCapture (){
+        //window.external.Deneme();
+        window.external.notify('Starting Screen Recorder Capture');
+        var SCElement = document.querySelector("button#StartSRCapture");
+        SCElement.click();
+        window.external.notify('Started Screen Recorder Capture');
+
+      };
+      function EmlakBOAStartWebcamCapture (){
+        window.external.notify('Starting Webcam Recorder Capture');
+        var SCElement = document.querySelector("button#StartWRCapture");
+        SCElement.click();
+        window.external.notify('Started Webcam Recorder Capture');
+      };
+
+      function EmlakBOAStopScreenCapture (){
+        window.external.notify('Stopping Screen Recorder Capture');
+        var SCElement = document.querySelector("button#StopSRCapture");
+        SCElement.click();
+        window.external.notify('Stopped Screen Recorder Capture');
+
+      };
+      function EmlakBOAStopWebcamCapture (){
+        window.external.notify('Stopping Webcam Recorder Capture');
+        var SCElement = document.querySelector("button#StopWRCapture");
+        SCElement.click();
+        window.external.notify('Stopped Webcam Recorder Capture');
+      };
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+
   </body>
 </html>

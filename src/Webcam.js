@@ -6,9 +6,9 @@ export default class Webcam extends React.Component {
     constructor(){
         super();
         this.state={
-            enableStartCapture : true,
+            enableStartWebCapture : true,
             enableDownloadRecording : false,
-            stream : null,
+            webStream : null,
             chunks : [],
             mediaRecorder : null,
             status : 'Inactive',
@@ -43,16 +43,16 @@ export default class Webcam extends React.Component {
               width: 1280, height: 720
             }
           };
-        this.state.stream = await navigator.mediaDevices.getUserMedia(constraints);
+        this.state.webStream = await navigator.mediaDevices.getUserMedia(constraints);
 
       
 
-      
-        console.log('getUserMedia() got stream:', this.state.stream);
-        window.stream = this.state.stream;
+      debugger;
+        console.log('getUserMedia() got stream:', this.state.webStream);
+        //window.stream = this.state.webStream;
 
         try {
-            this.mediaRecorder = new MediaRecorder(window.stream, this.state.options);
+            this.mediaRecorder = new MediaRecorder( this.state.webStream, this.state.options);
         } catch (e) {
             console.error('Exception while creating MediaRecorder:', e);
             return;
@@ -61,7 +61,7 @@ export default class Webcam extends React.Component {
 
 
         console.log('Created MediaRecorder', this.state.mediaRecorder, 'with options', this.state.options);
-        this.setState({enableDownloadRecording : true , enableStartCapture: false});
+        this.setState({enableDownloadRecording : true , enableStartWebCapture: false});
         this.mediaRecorder.onstop = (event) => {
             console.log('Recorder stopped: ', event);
             console.log('Recorded Blobs: ', recordedBlobss);
@@ -80,8 +80,8 @@ export default class Webcam extends React.Component {
       _stopCapturing(e) {
         //this.afterManualStop();
 
-        this.setState({enableDownloadRecording : false , enableStartCapture: true});
-        this.state.stream.getTracks().forEach(track => track.stop());
+        this.setState({enableDownloadRecording : false , enableStartWebCapture: true});
+        this.state.webStream.getTracks().forEach(track => track.stop());
         this.mediaRecorder.stop();
 
         this._downloadCapture();
@@ -121,9 +121,10 @@ export default class Webcam extends React.Component {
             
                     <StyledMainDiv>
                         <StyledButton 
-                            display={!this.state.enableStartCapture ? "inherit" : "none"}
-                            Display={this.state.enableStartCapture}
+                            Display={this.state.enableStartWebCapture}
+                            disabled={!this.state.enableStartWebCapture}
                             onClick={e => this._startCapturing(e)}
+                            id="StartWRCapture"
                         >
                             Webcam kaydı başlatın
                         </StyledButton>
@@ -131,9 +132,11 @@ export default class Webcam extends React.Component {
                             href="https://github.com/styled-components/styled-components"
                             target="_blank"
                             rel="noopener"
-                            display={!this.state.enableDownloadRecording ? "inherit" : "none"}
                             Display={this.state.enableDownloadRecording}
+                            disabled={!this.state.enableDownloadRecording}
                             onClick={e => this._stopCapturing(e)}
+                            id="StopWRCapture"
+                            
                         >
                         Kaydı Durdurun ve İndirin
                         </StyledButton>

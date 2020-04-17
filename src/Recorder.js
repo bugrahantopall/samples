@@ -99,7 +99,8 @@ export default class Recorder extends React.Component {
                             //display={!this.state.enableStartCapture ? "inherit" : "none"}
                             onClick={e => this._startCapturing(e)}
                             Display={this.state.enableStartCapture}
-
+                            disabled={!this.state.enableStartCapture}
+                            id="StartSRCapture"
                         >
                             Ekran Görüntü Kaydı Başlatın
                         </StyledButton>
@@ -109,7 +110,9 @@ export default class Recorder extends React.Component {
                             rel="noopener"
                             //display={!this.state.enableDownloadRecording ? "inherit" : "none"}
                             Display={this.state.enableDownloadRecording}
+                            disabled={!this.state.enableDownloadRecording}
                             onClick={e => this._stopCapturing(e)}
+                            id="StopSRCapture"
                         >
                         Kaydı Durdurun ve İndirin
                         </StyledButton>
